@@ -4,7 +4,7 @@ import time
 import random
 
 # Set the snake speed - how fast can it move?
-snake_speed = 15
+snake_speed = 2
 
 # Set the display window size
 # Window size
@@ -30,16 +30,16 @@ game_window = pygame.display.set_mode((window_x, window_y))
 fps = pygame.time.Clock()
 
 # Set a default position for the snake
-snake_position = []
+snake_position = [50,240]
 
 # Define first 4 blocks of snake body (let's say each block is 10x10 pixels)
-snake_body = []
+snake_body = [[50,240], [40,240],[30,240]]
 
-# Generate a random starting position for the fruit which the snake will try to eat
-# Note: Remember that the fruit must appear within the window boundaries and at a position that the snake can reach (i.e. the snake is 10x10 pixels)
-fruit_position = []
+# Generate a random starting position for the apple which the snake will try to eat
+# Note: Remember that the apple must appear within the window boundaries and at a position that the snake can reach (i.e. the snake is 10x10 pixels)
+apple_position = [random.randint(0,window_x//10 * 10),random.randint(0,window_y//10 * 10)]
 
-fruit_spawn = True
+apple_spawn = True
 
 # Set default snake direction towards
 # right
@@ -105,7 +105,15 @@ while True:
     # Hint: You can use pygame.KEYDOWN event to detect key presses
     # Hint 2: You can use pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT to detect specific arrow key presses
     for event in pygame.event.get():
-        pass  # Replace with your code to handle key events
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                change_to ='UP'
+            if event.key == pygame.K_DOWN: 
+                change_to ='DOWN' 
+            if event.key == pygame.K_RIGHT:
+                change_to ='RIGHT'
+            if event.key == pygame.K_LEFT: 
+                change_to ='LEFT'# Replace with your code to handle key events
 
     # If two keys pressed simultaneously we don't want snake to move into two directions simultaneously
     if change_to == 'UP' and direction != 'DOWN':
@@ -119,38 +127,50 @@ while True:
 
     # Create logic to move the snake in the specified direction - remember the snake moves by 10 pixels in each direction
     if direction == 'UP':
-        pass # Replace with your code to move up
+        snake_position[1] -= 10
     if direction == 'DOWN':
-        pass # Replace with your code to move down
+        snake_position[1] += 10 # Replace with your code to move down
     if direction == 'LEFT':
-        pass # Replace with your code to move left
+        snake_position[0] -= 10 # Replace with your code to move left
     if direction == 'RIGHT':
-        pass # Replace with your code to move right
+        snake_position[0] += 10 # Replace with your code to move right
 
-    # Snake body growing mechanism - if fruits and snakes collide then scores will be incremented by 10
+    # Snake body growing mechanism - if apples and snakes collide then scores will be incremented by 10
     # Hint: Use .insert() method to add block of length snake_position to the snake_body list
-    # Your code here
+    snake_body.insert(0,list(snake_position))
+    if snake_position[0] == apple_position[0] and snake_position[1] == apple_position[1]:
+        apple_spawn = False
+        score += 1
+    else:
+        snake_body.pop()
 
-    # Check if the snake has eaten the fruit - if the snake has eaten the fruit, then the head of the snake (snake_position) will be equal to the fruit (fruit_position)
-    # If they are equal, increase the score by 10 and set fruit_spawn to False (to indicate that we need to spawn a new fruit)
+    # Check if the snake has eaten the apple - if the snake has eaten the apple, then the head of the snake (snake_position) will be equal to the apple (apple_position)
+    # If they are equal, increase the score by 10 and set apple_spawn to False (to indicate that we need to spawn a new apple)
     # Else, remove the last block of the snake body using .pop() method - this makes the snake move forward without growing the body
     # Your code here
         
-    # Spawn a new fruit if fruit_spawn is False and set fruit_spawn to True
-    # After spawning the fruit, make sure to set game_window.fill(black) to refresh the game window
+    # Spawn a new apple if apple_spawn is False and set apple_spawn to True
+    # After spawning the apple, make sure to set game_window.fill(black) to refresh the game window
     # Your code here
+
+    if apple_spawn == False:
+        apple_position = [random.randint(0,window_x//10 * 10),random.randint(0,window_y//10 * 10)]
     
-    # Draw the snake and fruit on the game window
+    apple_spawn = True
+    game_window.fill(black)
+   
+    
+    # Draw the snake and apple on the game window
     for pos in snake_body:
         pygame.draw.rect(game_window, green,
                          pygame.Rect(pos[0], pos[1], 10, 10))
     pygame.draw.rect(game_window, white, pygame.Rect(
-        fruit_position[0], fruit_position[1], 10, 10))
+        apple_position[0], apple_position[1], 10, 10))
 
-    # Set the Game Over conditions
     # I.e. First, check if the snake has hit the boundaries of the window
     # Your code here
-
+    if snake_position[1] < 0 or snake_position[0] < 0 or snake_position[1] > window_y or snake_position[0] > window_x:
+        game_over()
     # Second, check if the snake has hit itself - loop through each block in the snake_body list (except the head) and check if the head's position is equal to any block's position
     # Your code here
 
